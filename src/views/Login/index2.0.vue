@@ -15,9 +15,9 @@
         :model="ruleForm"
         status-icon
         :rules="rules"
-        ref="loginForm"
+        ref="ruleForm"
         class="login-form"
-        size="medium"
+        size="mini"
       >
         <el-form-item prop="username" class="item-form">
           <label>邮箱</label>
@@ -57,7 +57,7 @@
           </el-row>
         </el-form-item>
         <el-form-item>
-          <el-button type="danger" @click="submitForm('loginForm')" class="login-btn block">提交</el-button>
+          <el-button type="danger" @click="submitForm('ruleForm')" class="login-btn block">提交</el-button>
           <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
         </el-form-item>
       </el-form>
@@ -72,41 +72,12 @@ import {
   validatePass,
   validateVCode
 } from "@/utils/validate";
-import {
-  reactive,
-  ref,
-  isRef,
-  toRefs,
-  onBeforeMount,
-  onMounted
-} from "@vue/composition-api";
 
 export default {
   name: "login",
-  setup(props, context) {
-    // 这里放置data数据、生命周期、自定义函数
-
-    /**
-     *声明数据
-     */
-
-    //模块值
-    const model = ref("login");
-    //模块title
-    const menuTab = reactive([
-      { txt: "登录", current: true, type: "login" },
-      { txt: "注册", current: false, type: "register" }
-    ]);
-    //表单绑定数据
-    const ruleForm = reactive({
-      username: "",
-      password: "",
-      passwords: "",
-      code: ""
-    });
-
+  data() {
     //验证用户名
-    let validateUserName = (rule, value, callback) => {
+    var validateUserName = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入用户名"));
       } else if (validateEmail(value)) {
@@ -118,8 +89,8 @@ export default {
 
     // 验证密码
     let validatePassword = (rule, value, callback) => {
-      ruleForm.password = stripscript(value);
-      value = ruleForm.password;
+      this.ruleForm.password = stripscript(value);
+      value = this.ruleForm.password;
       if (value === "") {
         callback(new Error("请输入密码"));
       } else if (validatePass(value)) {
@@ -132,7 +103,7 @@ export default {
     let validatePasswords = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value != ruleForm.password) {
+      } else if (value != this.ruleForm.password) {
         callback(new Error("重复密码不正确"));
       } else {
         callback();
@@ -140,8 +111,8 @@ export default {
     };
     // 验证验证码
     let validateCode = (rule, value, callback) => {
-      ruleForm.code = stripscript(value);
-      value = ruleForm.code;
+      this.ruleForm.code = stripscript(value);
+      value = this.ruleForm.code;
       if (value === "") {
         return callback(new Error("请输入验证码"));
       } else if (validateVCode(value)) {
@@ -150,40 +121,37 @@ export default {
         callback();
       }
     };
-
-    //验证规则数据
-    const rules = reactive({
-      username: [{ validator: validateUserName, trigger: "blur" }],
-      password: [{ validator: validatePassword, trigger: "blur" }],
-      passwords: [{ validator: validatePasswords, trigger: "blur" }],
-      code: [{ validator: validateCode, trigger: "blur" }]
-    });
-
-    /**
-     *生命周期
-     */
-
-    //挂在之前
-    onBeforeMount(() => {});
-    //挂在完成后
-    onMounted(() => {});
-
-    const toggleMenu = data => {
-      model.value = data.type;
-      menuTab.forEach(element => {
+    return {
+      // 模块值
+      model: "login",
+      menuTab: [
+        { txt: "登录", current: true, type: "login" },
+        { txt: "注册", current: false, type: "register" }
+      ],
+      ruleForm: {
+        username: "",
+        password: "",
+        passwords: "",
+        code: ""
+      },
+      rules: {
+        username: [{ validator: validateUserName, trigger: "blur" }],
+        password: [{ validator: validatePassword, trigger: "blur" }],
+        passwords: [{ validator: validatePasswords, trigger: "blur" }],
+        code: [{ validator: validateCode, trigger: "blur" }]
+      }
+    };
+  },
+  methods: {
+    toggleMenu(data) {
+      this.model = data.type;
+      this.menuTab.forEach(element => {
         element.current = false;
       });
       data.current = true;
-      resetFromData();
-    };
-    // 清除表单数据
-    const resetFromData = () => {
-      // 重置表单
-      // this.$refs[formName].resetFields(); //2.0
-      refs.loginForm.resetFields(); // 3.0
-    };
-    const submitForm = formName => {
-      context.$refs[formName].validate(valid => {
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
@@ -191,23 +159,10 @@ export default {
           return false;
         }
       });
-    };
-    const resetForm = formName => {
-      $refs[formName].resetFields();
-    };
-
-    /**
-     *返回结果给html
-     */
-    return {
-      model,
-      menuTab,
-      ruleForm,
-      rules,
-      toggleMenu,
-      submitForm,
-      resetForm
-    };
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    }
   }
 };
 </script>
