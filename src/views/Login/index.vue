@@ -81,6 +81,8 @@ import {
   onMounted
 } from "@vue/composition-api";
 
+import service from "@/utils/request";
+
 export default {
   name: "login",
   setup(props, context) {
@@ -183,7 +185,7 @@ export default {
       refs.loginForm.resetFields(); // 3.0
     };
     const submitForm = formName => {
-      context.$refs[formName].validate(valid => {
+      context.refs[formName].validate(valid => {
         if (valid) {
           alert("submit!");
         } else {
