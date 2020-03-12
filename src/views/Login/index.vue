@@ -52,7 +52,7 @@
               <el-input v-model="ruleForm.code"></el-input>
             </el-col>
             <el-col :span="9">
-              <el-button type="success" class="block">获取验证码</el-button>
+              <el-button type="success" class="block" @click="getTheSms()">获取验证码</el-button>
             </el-col>
           </el-row>
         </el-form-item>
@@ -81,7 +81,7 @@ import {
   onMounted
 } from "@vue/composition-api";
 
-import service from "@/utils/request";
+import { getSms } from "@/api/login";
 
 export default {
   name: "login",
@@ -178,12 +178,25 @@ export default {
       data.current = true;
       resetFromData();
     };
-    // 清除表单数据
+
+    /**
+     *清除表单数据
+     */
     const resetFromData = () => {
       // 重置表单
-      // this.$refs[formName].resetFields(); //2.0
-      refs.loginForm.resetFields(); // 3.0
+      context.refs.loginForm.resetFields(); // 3.0
     };
+
+    /**
+     *获取验证码
+     */
+    const getTheSms = () => {
+      getSms({ username: ruleForm.username });
+    };
+
+    /**
+     *提交表单
+     */
     const submitForm = formName => {
       context.refs[formName].validate(valid => {
         if (valid) {
@@ -207,6 +220,7 @@ export default {
       ruleForm,
       rules,
       toggleMenu,
+      getTheSms,
       submitForm,
       resetForm
     };
